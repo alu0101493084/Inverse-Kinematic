@@ -72,7 +72,7 @@ EPSILON = .01
 
 # introducción del punto para la cinemática inversa
 if len(sys.argv) != 3:
-  sys.exit("python " + sys.argv[0] + " x y")
+  sys.exit("El programa requiere dos parámetros: x y")
 objetivo=[float(i) for i in sys.argv[1:]]
 O=cin_dir(th,a)
 #O=zeros(len(th)+1) # Reservamos estructura en memoria

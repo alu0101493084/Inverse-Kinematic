@@ -32,8 +32,10 @@ def muestra_robot(O,obj):
   for i in range(len(T)):
     plt.plot(T[i][0], T[i][1], '-o', color=cs.hsv_to_rgb(i/float(len(T)),1,1))
   plt.plot(obj[0], obj[1], '*')
-  plt.pause(2)
-  plt.show()
+  plt.pause(0.0001)
+  # plt.show()
+  plt.draw()
+  plt.waitforbuttonpress(0)
   
 #  input()
   plt.close()
@@ -68,7 +70,7 @@ a =[5.,5.,5.]
 L = sum(a) # variable para representación gráfica
 EPSILON = .01
 
-plt.ion() # modo interactivo
+#plt.ion() modo interactivo
 
 # introducción del punto para la cinemática inversa
 if len(sys.argv) != 3:
@@ -87,12 +89,16 @@ while (dist > EPSILON and abs(prev-dist) > EPSILON/100.):
   prev = dist
   O=[cin_dir(th,a)]
   # Para cada combinación de articulaciones:
-  for i in range(len(th)):
-    # cálculo de la cinemática inversa:
-    print("Objetivo: ", objetivo, " pos: ", O[i])
+  for i in range(len(th)-1,-1,-1):
     
-  
-    # th[i] = "variacion de angulo" + th[i]
+    # cálculo de la cinemática inversa:
+    #print("Objetivo: ", objetivo, " pos: ", O[][i])
+    v_obj = np.subtract(objetivo,O[-1][i])
+    v_end = np.subtract(O[-1][-1],O[-1][i])
+    angulo_desplazado = atan2((v_obj[0]*v_end[1]) - (v_obj[1]*v_end[0]),
+                              (v_obj[0]*v_end[0]) + (v_obj[1]*v_end[1]))
+
+    th[i] = th[i] - angulo_desplazado
     
     O.append(cin_dir(th,a))
 

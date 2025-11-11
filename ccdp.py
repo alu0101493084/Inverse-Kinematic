@@ -32,20 +32,22 @@ def muestra_robot(O,obj):
   for i in range(len(T)):
     plt.plot(T[i][0], T[i][1], '-o', color=cs.hsv_to_rgb(i/float(len(T)),1,1))
   plt.plot(obj[0], obj[1], '*')
-  plt.pause(0.0001)
+  plt.pause(2)
   plt.show()
   
 #  input()
   plt.close()
 
 def matriz_T(d,th,a,al):
-   
+  # Los ángulos deben estar en Radianes
   return [[cos(th), -sin(th)*cos(al),  sin(th)*sin(al), a*cos(th)]
          ,[sin(th),  cos(th)*cos(al), -sin(al)*cos(th), a*sin(th)]
          ,[      0,          sin(al),          cos(al),         d]
          ,[      0,                0,                0,         1]
          ]
 
+# Devuelve una lista de coordenadas de (x,y) de cada uno de los puntos o
+# respecto al referencial inicial
 def cin_dir(th,a):
   #Sea 'th' el vector de thetas
   #Sea 'a'  el vector de longitudes
@@ -66,14 +68,14 @@ a =[5.,5.,5.]
 L = sum(a) # variable para representación gráfica
 EPSILON = .01
 
-#plt.ion() # modo interactivo
+plt.ion() # modo interactivo
 
 # introducción del punto para la cinemática inversa
 if len(sys.argv) != 3:
-  sys.exit("python " + sys.argv[0] + " x y")
+  sys.exit("El programa requiere dos parámetros: x y")
 objetivo=[float(i) for i in sys.argv[1:]]
+
 O=cin_dir(th,a)
-#O=zeros(len(th)+1) # Reservamos estructura en memoria
  # Calculamos la posicion inicial
 print ("- Posicion inicial:")
 muestra_origenes(O)
@@ -87,10 +89,10 @@ while (dist > EPSILON and abs(prev-dist) > EPSILON/100.):
   # Para cada combinación de articulaciones:
   for i in range(len(th)):
     # cálculo de la cinemática inversa:
-    
+    print("Objetivo: ", objetivo, " pos: ", O[i])
     
   
-    
+    # th[i] = "variacion de angulo" + th[i]
     
     O.append(cin_dir(th,a))
 

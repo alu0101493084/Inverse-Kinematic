@@ -66,7 +66,11 @@ def cin_dir(th,a):
 
 # valores articulares arbitrarios para la cinemática directa inicial
 th=[0.,0.,0.]
-a =[5.,5.,5.]
+a =[5.,0.,5.]
+prismatica = [False, True, False]
+qMin = np.array([-30 * pi / 180, 0, -30 * pi / 180])
+qMax = np.array([ 30 * pi / 180, 5,  30 * pi / 180])
+
 L = sum(a) # variable para representación gráfica
 EPSILON = .01
 
@@ -90,16 +94,33 @@ while (dist > EPSILON and abs(prev-dist) > EPSILON/100.):
   O=[cin_dir(th,a)]
   # Para cada combinación de articulaciones:
   for i in range(len(th)-1,-1,-1):
-    
-    # cálculo de la cinemática inversa:
-    #print("Objetivo: ", objetivo, " pos: ", O[][i])
-    v_obj = np.subtract(objetivo,O[-1][i])
-    v_end = np.subtract(O[-1][-1],O[-1][i])
-    angulo_desplazado = atan2((v_obj[0]*v_end[1]) - (v_obj[1]*v_end[0]),
-                              (v_obj[0]*v_end[0]) + (v_obj[1]*v_end[1]))
+    if not prismatica[i]:
+      # cálculo de la cinemática inversa:
+      #print("Objetivo: ", objetivo, " pos: ", O[][i])
 
-    th[i] = th[i] - angulo_desplazado
-    
+      v_obj = np.subtract(objetivo,O[-1][i])
+      v_end = np.subtract(O[-1][-1],O[-1][i])
+      angulo_desplazado = atan2((v_obj[0]*v_end[1]) - (v_obj[1]*v_end[0]),
+                                (v_obj[0]*v_end[0]) + (v_obj[1]*v_end[1]))
+
+      th[i] = th[i] - angulo_desplazado
+      
+      th[i] = (th[i] + pi) % (2 * pi) - pi
+      th[i] = np.clip(th[i], qMin, qMax)[i]
+
+    else:
+      #Calcular omega = sumatorio de thetas anteriores
+      omega = np.sum(th[:i+1])
+
+      #Calcular d = unitario · (R - Ox)
+      v_obj = np.subtract(objetivo,O[-1][i])
+      v_end = np.subtract(O[-1][-1],O[-1][i])
+      d = (cos(omega), sin(omega)) * np.subtract(v_obj, v_end)
+      #L = L + d
+      a[i] = a[i] + d
+      #Limitar L según qMin y qMax
+      a[i] = np.clip(a[i], qMin, qMax)[i]
+
     O.append(cin_dir(th,a))
 
   dist = np.linalg.norm(np.subtract(objetivo,O[-1][-1]))

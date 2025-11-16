@@ -26,8 +26,8 @@ def muestra_origenes(O,final=0):
 def muestra_robot(O,obj):
   # Muestra el robot graficamente
   plt.figure()
-  plt.xlim(-L,L)
-  plt.ylim(-L,L)
+  plt.xlim(-abs(objetivo[0]),abs(objetivo[0]))
+  plt.ylim(-abs(objetivo[1]),abs(objetivo[1]))
   T = [np.array(o).T.tolist() for o in O]
   for i in range(len(T)):
     plt.plot(T[i][0], T[i][1], '-o', color=cs.hsv_to_rgb(i/float(len(T)),1,1))
@@ -65,13 +65,14 @@ def cin_dir(th,a):
 # Cálculo de la cinemática inversa de forma iterativa por el método CCD
 
 # valores articulares arbitrarios para la cinemática directa inicial
-th=[0.,0.,0.]
-a =[5.,0.,5.]
-prismatica = [False, True, False]
-qMin = np.array([-30 * pi / 180, 0, -30 * pi / 180])
-qMax = np.array([ 30 * pi / 180, 5,  30 * pi / 180])
+th=[0.,0.,0.,0.]
+a =[5.,5.,5.,5.]
+prismatica = [False, False, True, True]
 
-L = sum(a) # variable para representación gráfica
+toRadianes = pi / 180
+
+qMin = np.array([-90 * toRadianes, -90 * toRadianes,  0,  0])
+qMax = np.array([ 90 * toRadianes,  90 * toRadianes, 10, 10])
 EPSILON = .01
 
 #plt.ion() modo interactivo
@@ -110,12 +111,12 @@ while (dist > EPSILON and abs(prev-dist) > EPSILON/100.):
 
     else:
       #Calcular omega = sumatorio de thetas anteriores
-      omega = np.sum(th[:i+1])
+      omega = sum(th[:i+1])
 
       #Calcular d = unitario · (R - Ox)
       v_obj = np.subtract(objetivo,O[-1][i])
       v_end = np.subtract(O[-1][-1],O[-1][i])
-      d = (cos(omega), sin(omega)) * np.subtract(v_obj, v_end)
+      d = np.dot(np.array([cos(omega), sin(omega)]), np.subtract(v_obj, v_end))
       #L = L + d
       a[i] = a[i] + d
       #Limitar L según qMin y qMax
@@ -139,6 +140,6 @@ print ("- Umbral de convergencia epsilon: " + str(EPSILON))
 print ("- Distancia al objetivo:          " + str(round(dist,5)))
 print ("- Valores finales de las articulaciones:")
 for i in range(len(th)):
-  print ("  theta" + str(i+1) + " = " + str(round(th[i],3)))
+  print ("  theta" + str(i+1) + " = " + str(round(th[i],3)) + " (R) | " + str(round(th[i] / toRadianes,3)) + "º")
 for i in range(len(th)):
   print ("  L" + str(i+1) + "     = " + str(round(a[i],3)))
